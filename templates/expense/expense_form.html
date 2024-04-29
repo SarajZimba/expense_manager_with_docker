@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Expense Form</h1>
+    <form method="post" id="expense-form">
+        {% csrf_token %}
+        <div id="expense-formset">
+            <!-- Your initial form fields -->
+            <div class="expense-form-row">
+                <input type="text" name="title[]" class="form-control mb-2" placeholder="Title" required>
+                <input type="text" name="amount[]" class="form-control mb-2" placeholder="Amount" required>
+                <input type="date" name="date[]" class="form-control mb-2" placeholder="Date" required>
+                <select name="category[]" class="form-control mb-2">
+                    <option value="" disabled selected>Select Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.title }}</option>
+                    {% endfor %}
+                </select>
+                
+                <input type="text" name="note[]" class="form-control mb-2" placeholder="Notes">
+                <!-- Add more fields as needed -->
+                <button type="button" class="btn btn-danger remove-expense">Remove</button>
+            </div>
+        </div>
+        <button type="button" id="add-expense" class="btn btn-primary mt-3">Add Expense</button>
+        <button type="submit" class="btn btn-success mt-3">Submit</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("add-expense").addEventListener("click", function () {
+            var formset = document.getElementById("expense-formset");
+            var newRow = document.createElement("div");
+            newRow.classList.add("expense-form-row", "mb-3", "border", "p-3");
+            newRow.innerHTML = `
+                <input type="text" name="title[]" class="form-control mb-2" placeholder="Title">
+                <input type="text" name="amount[]" class="form-control mb-2" placeholder="Amount">
+                <input type="date" name="date[]" class="form-control mb-2" placeholder="Date">
+                <select name="category[]" class="form-control mb-2">
+                    <option value="" disabled selected>Select Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.title }}</option>
+                    {% endfor %}
+                </select>                
+                <input type="text" name="note[]" class="form-control mb-2" placeholder="Notes">
+                <!-- Add more fields as needed -->
+                <button type="button" class="btn btn-danger remove-expense">Remove</button>
+            `;
+            var today = new Date().toISOString().split('T')[0];
+            newRow.querySelector('input[type="date"]').value = today;
+            formset.appendChild(newRow);
+
+        });
+
+        document.addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-expense")) {
+                event.target.closest(".expense-form-row").remove();
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var today = new Date().toISOString().split('T')[0];
+        document.querySelector('input[type="date"]').value = today;
+    });
+</script>
+{% endblock %}
